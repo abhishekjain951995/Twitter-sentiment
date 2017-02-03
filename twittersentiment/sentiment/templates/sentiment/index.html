@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html ng-app = "TwitterSentiment">
+<head>
+    <title>Twitter Sentiment Analysis</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'sentiment/css/nv.d3.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'sentiment/css/style.css' %}" />
+
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+
+        svg {
+            display: block;
+            float: left;
+        }
+        #test2 {
+            height: 350px !important;
+            width: 350px !important;
+        }
+        #test1 {
+            height: 350px !important;
+            width: 350px !important;
+        }
+
+        html, body {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+        .nvd3.nv-pie.nv-chart-donut2 .nv-pie-title {
+            fill: rgba(70, 107, 168, 0.78);
+        }
+
+        .nvd3.nv-pie.nv-chart-donut1 .nv-pie-title {
+            opacity: 0.4;
+            fill: rgba(224, 116, 76, 0.91);
+        }
+
+    </style>
+
+
+</head>
+<body class='with-3d-shadow with-transitions'>
+
+  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+  <form action="{% url 'sentiment:vote' 1 %}" method="post">
+    {% csrf_token %}
+      <input type="text" name="choice" />
+      <input type="submit" value="Find the Sentiment" />
+  </form>
+  <!-- <input type = 'text' ng-model='searchBox'>
+    <p>
+    {% verbatim %}
+    {{searchBox}}
+    {% endverbatim %}
+  </p> -->
+
+  <div ng-controller = "GraphCtrl">
+    <svg id="test1" class="mypiechart"></svg>
+  </div>
+
+
+
+
+
+</body>
+
+<!-- *************************************IMPORTS************************************* -->
+{% load static %}
+
+<!-- Jquery Script Import -->
+<script src="{% static 'sentiment/js/jquery-3.1.1.slim.min.js' %}"
+			  crossorigin="anonymous"></script>
+<!-- Bootstrap Script Import -->
+<script src="{% static 'sentiment/js/bootstrap.min.js' %}"
+        crossorigin="anonymous"></script>
+<!-- AngularJs Script Import -->
+<script src = "{% static 'sentiment/js/angular.min.js' %}"></script>
+<!-- d3Js script Import -->
+<script src="{% static 'sentiment/js/d3.min.js' %}" charset="utf-8"></script>
+<!-- nvd3 js script Import -->
+<script src="{% static 'sentiment/js/nv.d3.js' %}"></script>
+<!-- stream_layers script Import -->
+<script src="{% static 'sentiment/js/stream_layers.js' %}"></script>
+<!-- Custom Controller Script Include -->
+<script src="{% static 'sentiment/js/controller.js' %}"></script>
+</html>

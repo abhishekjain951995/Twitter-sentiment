@@ -1,0 +1,49 @@
+<html ng-app = "TwitterSentiment">
+<head>
+
+  <title></title>
+  {% load static %}
+  <!-- Bootstrap css -->
+  <link rel="stylesheet"
+        href="{% static 'sentiment/css/bootstrap.min.css' %}"
+        crossorigin="anonymous">
+  <!-- Nvd3 CSS -->
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'sentiment/css/nv.d3.css' %}" />
+        
+</head>
+
+<body>
+<form action="{% url 'sentiment:senti_search' %}" method="post">
+{% csrf_token %}
+  <input type="text" name="term" />
+  <input type="submit" value="Search" />
+</form>
+
+
+
+</body>
+
+<!-- *************************************IMPORTS************************************* -->
+{% load static %}
+
+<!-- Jquery Script Import -->
+<script src="{% static 'sentiment/js/jquery-3.1.1.slim.min.js' %}"
+			  crossorigin="anonymous"></script>
+<!-- Bootstrap Script Import -->
+<script src="{% static 'sentiment/js/bootstrap.min.js' %}"
+        crossorigin="anonymous"></script>
+<!-- AngularJs Script Import -->
+<script src = "{% static 'sentiment/js/angular.min.js' %}"></script>
+<!-- d3Js script Import -->
+<script src="{% static 'sentiment/js/d3.min.js' %}" charset="utf-8"></script>
+<!-- nvd3 js script Import -->
+<script src="{% static 'sentiment/js/nv.d3.js' %}"></script>
+<!-- stream_layers script Import -->
+<script src="{% static 'sentiment/js/stream_layers.js' %}"></script>
+<!-- Custom Controller Script Include -->
+<script src="{% static 'sentiment/js/controller.js' %}"></script>
+
+
+</html>

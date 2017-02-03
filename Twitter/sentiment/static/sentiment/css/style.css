@@ -1,0 +1,35 @@
+body {
+    background: white url("../images/background.jpg") no-repeat right bottom;
+}
+text {
+    font: 12px sans-serif;
+}
+
+svg {
+    display: block;
+    float: left;
+}
+#test2 {
+    height: 350px !important;
+    width: 350px !important;
+}
+#test1 {
+    height: 350px !important;
+    width: 350px !important;
+}
+
+html, body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+.nvd3.nv-pie.nv-chart-donut2 .nv-pie-title {
+    fill: rgba(70, 107, 168, 0.78);
+}
+
+.nvd3.nv-pie.nv-chart-donut1 .nv-pie-title {
+    opacity: 0.4;
+    fill: rgba(224, 116, 76, 0.91);
+}

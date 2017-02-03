@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title>
+    Tweets Results
+  </title>
+</head>
+<body>
+
+  <ol>
+    {% for tweet in tweets %}
+        <li>
+          <ul>
+            <li>{{ tweet.tweet_user }}</li>
+            <li>{{ tweet.tweet_text }}</li>
+            <li>{{tweet.tweet_polarity}}</li>
+          </ul>
+        </li>
+    {% endfor %}
+  </ol>
+
+</body>
+</html>

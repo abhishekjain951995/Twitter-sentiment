@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    {% load static %}
+    <!-- Bootstrap css -->
+    <link rel="stylesheet"
+          href="{% static 'sentiment/css/bootstrap.min.css' %}"
+          crossorigin="anonymous">
+    <!-- Nvd3 CSS -->
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'sentiment/css/nv.d3.css' %}" />
+
+
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+
+        #showTweets {
+            width: 700px;
+            height: 300px;
+            overflow: scroll;
+        }
+        #tweet{
+          height: 100px;
+          align: "center"
+        }
+
+        svg {
+            display: block;
+            float: left;
+        }
+        #test2 {
+            height: 350px !important;
+            width: 50% !important;
+        }
+        #test1 {
+            height: 350px !important;
+            width: 50% !important;
+        }
+
+        html, body {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+        .nvd3.nv-pie.nv-chart-donut2 .nv-pie-title {
+            fill: rgba(70, 107, 168, 0.78);
+        }
+
+        .nvd3.nv-pie.nv-chart-donut1 .nv-pie-title {
+            opacity: 0.4;
+            fill: rgba(224, 116, 76, 0.91);
+        }
+
+    </style>
+</head>
+<body class='with-3d-shadow with-transitions'>
+
+<svg id="test1" class="mypiechart"></svg>
+<svg id="test2" class="mypiechart"></svg>
+<div id="showTweets">
+<ol>
+  {% for tweet in tweets %}
+      <div id="tweet">
+        {{ tweet.tweet_user }}</br>
+        {{ tweet.tweet_text }}</br>
+        {{tweet.tweet_polarity}}</br>
+      </div>
+  {% endfor %}
+</ol>
+</div>
+
+<div id="chart1"></div>
+
+</body>
+
+<!-- *************************************IMPORTS************************************* -->
+{% load static %}
+
+<!-- Jquery Script Import -->
+<script src="{% static 'sentiment/js/jquery-3.1.1.slim.min.js' %}"
+			  crossorigin="anonymous"></script>
+<!-- Bootstrap Script Import -->
+<script src="{% static 'sentiment/js/bootstrap.min.js' %}"
+        crossorigin="anonymous"></script>
+<!-- AngularJs Script Import -->
+<script src = "{% static 'sentiment/js/angular.min.js' %}"></script>
+<!-- d3Js script Import -->
+<script src="{% static 'sentiment/js/d3.min.js' %}" charset="utf-8"></script>
+<!-- nvd3 js script Import -->
+<script src="{% static 'sentiment/js/nv.d3.js' %}"></script>
+<!-- stream_layers script Import -->
+<script src="{% static 'sentiment/js/stream_layers.js' %}"></script>
+<!-- Custom Controller Script Include -->
+<script src="{% static 'sentiment/js/controller.js' %}"></script>
+
+<script>
+
+    var tweetPercent = [
+        {key: "Positive", y: "{{positivePercent}}"},
+        {key: "Negetive", y: "{{negetivePercent}}"},
+        {key: "Neutral", y: "{{neutralPercent}}"},
+
+    ];
+    var tweetPolarity = [
+        {key: "Positive", y: "{{positiveTotal}}"},
+        {key: "Negetive", y: "{{negetiveTotal}}"},
+    ];
+
+
+    console.log(tweetPercent)
+    console.log(tweetPolarity)
+
+
+    var height = 350;
+    var width = 350;
+
+    var chart1;
+    nv.addGraph(function() {
+        var chart1 = nv.models.pieChart()
+            .x(function(d) { return d.key })
+            .y(function(d) { return d.y })
+            .donut(true)
+            .width(width)
+            .height(height)
+            .padAngle(.08)
+            .cornerRadius(5)
+            .id('donut1'); // allow custom CSS for this one svg
+
+        chart1.title("100%");
+        chart1.pie.donutLabelsOutside(true).donut(true);
+
+        d3.select("#test1")
+            .datum(tweetPercent)
+            .transition().duration(1200)
+            .call(chart1);
+
+        return chart1;
+
+    });
+
+    var chart2;
+    nv.addGraph(function() {
+        var chart2 = nv.models.pieChart()
+            .x(function(d) { return d.key })
+            .y(function(d) { return d.y })
+            .donut(true)
+            .width(width)
+            .height(height)
+            .padAngle(.08)
+            .cornerRadius(5)
+            .id('donut1'); // allow custom CSS for this one svg
+
+        chart2.title("100%");
+        chart2.pie.donutLabelsOutside(true).donut(true);
+
+        d3.select("#test2")
+            .datum(tweetPolarity)
+            .transition().duration(1200)
+            .call(chart2);
+
+        return chart2;
+
+    });
+</script>
+<script>
+    // Wrapping in nv.addGraph allows for '0 timeout render', stores rendered charts in nv.graphs, and may do more in the future... it's NOT required
+    var chart;
+    var data;
+    var legendPosition = "top";
+
+    nv.addGraph(function() {
+        chart = nv.models.lineChart()
+            .options({
+                duration: 300,
+                useInteractiveGuideline: true
+            })
+        ;
+
+        // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
+        chart.xAxis
+            .axisLabel("Date")
+            .tickFormat(function(d){ return d3.time.format("%Y-%m-%d")(d) })
+            .staggerLabels(true)
+        ;
+
+        chart.yAxis
+            .axisLabel('Polarity')
+            .tickFormat(function(d) {
+                if (d == null) {
+                    return 'N/A';
+                }
+                return d3.format(',.2f')(d);
+            })
+        ;
+
+        data = getFormattedData();
+
+        d3.select('#chart1').append('svg')
+            .datum(data)
+            .call(chart);
+
+        nv.utils.windowResize(chart.update);
+
+        return chart;
+    });
+
+    function getFormattedData() {
+        var datevise_tweets = [];
+        var tweets = "{{tweets}}";
+        for (tweet in tweets) {
+          datevise_tweets.push({x:tweets[tweet].tweet_date,y:tweets[tweet].tweet_polarity});
+          console.log(tweets[tweet].tweet_date)
+        }
+
+        return [{
+                area: true,
+                values: datevise_tweets,
+                key: "Tweet Trends with Time",
+                color: '#ff7f0e',
+        }];
+    }
+
+    function sinAndCos() {
+        var sin = [],
+            sin2 = [],
+            cos = [],
+            rand = [],
+            rand2 = []
+            ;
+
+        for (var i = 0; i < 100; i++) {
+            sin.push({x: i, y: i % 10 == 5 ? null : Math.sin(i/10) }); //the nulls are to show how defined works
+            sin2.push({x: i, y: Math.sin(i/5) * 0.4 - 0.25});
+            cos.push({x: i, y: .5 * Math.cos(i/10)});
+            rand.push({x:i, y: Math.random() / 10});
+            rand2.push({x: i, y: Math.cos(i/10) + Math.random() / 10 })
+        }
+
+        return [
+            {
+                area: true,
+                values: sin,
+                key: "Sine Wave",
+                color: "#ff7f0e",
+                strokeWidth: 4,
+                classed: 'dashed'
+            },
+            {
+                values: cos,
+                key: "Cosine Wave",
+                color: "#2ca02c"
+            },
+            {
+                values: rand,
+                key: "Random Points",
+                color: "#2222ff"
+            },
+            {
+                values: rand2,
+                key: "Random Cosine",
+                color: "#667711",
+                strokeWidth: 3.5
+            },
+            {
+                area: true,
+                values: sin2,
+                key: "Fill opacity",
+                color: "#EF9CFB",
+                fillOpacity: .1
+            }
+        ];
+    }
+
+</script>
+
+</html>
